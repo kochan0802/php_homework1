@@ -1,3 +1,21 @@
+<?php
+session_start();
+require_once '../functions.php';
+require_once '../classes/UserLogic.php';
+
+$result = UserLogic::checkLogin();
+if($result){
+    header('Location: mypage.php');
+    return;
+}
+
+// 三項演算子（ifを使わなくても条件分岐ができる）
+$login_err = isset($_SESSION['login_err']) ?
+$_SESSION['login_err'] : null;
+// 2回目は消す
+unset($_SESSION['login_err']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +28,9 @@
     
 
 <h2>ユーザー登録フォーム</h2>
+<?php if (isset($login_err)) : ?>
+        <p><?php echo $login_err; ?> </p>
+    <?php endif; ?>
 <form action="register.php" method="POST">
 <p>
     <label for="username">ユーザー名：</label>     
@@ -30,11 +51,11 @@
     <label for="password_conf">パスワード確認：</label>    
     <input type="password" name="password_conf">
 </p>
-
+ <input type="hidden" name="csrf_token" value="<?php echo h(setToken()); ?>">
 <p>
     <input type="submit" value="新規登録">
 </p>
 </form>
-
+<a href="login_form.php">ログインする</a>
 </body>
 </html>
